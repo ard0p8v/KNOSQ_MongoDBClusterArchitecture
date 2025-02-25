@@ -1,0 +1,1 @@
+# KNOSQ_MongoDBClusterArchitecture
