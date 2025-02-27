@@ -13,11 +13,7 @@ services:
       - ./security/mongodb-keyfile:/data/mongodb-keyfile
       - mongodb_cluster_router01_db:/data/db
       - mongodb_cluster_router01_config:/data/configdb
-    healthcheck:
-      test: ["CMD-SHELL", "mongosh --username $MONGODB_INIT_ROOT_USERNAME --password $MONGODB_INIT_ROOT_PASSWORD --authenticationDatabase admin --eval 'db.adminCommand({ ping: 1 })'"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+
     logging:
       driver: "json-file"
       options:
@@ -39,11 +35,7 @@ services:
     restart: always
     links:
       - router01
-    healthcheck:
-      test: ["CMD-SHELL", "mongosh --username $MONGODB_INIT_ROOT_USERNAME --password $MONGODB_INIT_ROOT_PASSWORD --authenticationDatabase admin --eval 'db.adminCommand({ ping: 1 })'"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+
     logging:
       driver: "json-file"
       options:
@@ -68,11 +60,7 @@ services:
       - shard01-a
       - shard02-a
       - shard03-a
-    healthcheck:
-      test: ["CMD-SHELL", "mongosh --username $MONGODB_INIT_ROOT_USERNAME --password $MONGODB_INIT_ROOT_PASSWORD --authenticationDatabase admin --eval 'db.adminCommand({ ping: 1 })'"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+
     logging:
       driver: "json-file"
       options:
@@ -94,11 +82,7 @@ services:
     restart: always
     links:
       - configsvr01
-    healthcheck:
-      test: ["CMD-SHELL", "mongosh --username $MONGODB_INIT_ROOT_USERNAME --password $MONGODB_INIT_ROOT_PASSWORD --authenticationDatabase admin --eval 'db.adminCommand({ ping: 1 })'"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+
     logging:
       driver: "json-file"
       options:
@@ -120,11 +104,7 @@ services:
     restart: always
     links:
       - configsvr02
-    healthcheck:
-      test: ["CMD-SHELL", "mongosh --username $MONGODB_INIT_ROOT_USERNAME --password $MONGODB_INIT_ROOT_PASSWORD --authenticationDatabase admin --eval 'db.adminCommand({ ping: 1 })'"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+
     logging:
       driver: "json-file"
       options:
@@ -149,11 +129,7 @@ services:
     links:
       - shard01-b
       - shard01-c
-    healthcheck:
-      test: ["CMD-SHELL", "mongosh --username $MONGODB_INIT_ROOT_USERNAME --password $MONGODB_INIT_ROOT_PASSWORD --authenticationDatabase admin --eval 'db.adminCommand({ ping: 1 })'"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+
     logging:
       driver: "json-file"
       options:
@@ -173,11 +149,7 @@ services:
     ports:
       - 27123:27017
     restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "mongosh --username $MONGODB_INIT_ROOT_USERNAME --password $MONGODB_INIT_ROOT_PASSWORD --authenticationDatabase admin --eval 'db.adminCommand({ ping: 1 })'"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+
     logging:
       driver: "json-file"
       options:
@@ -197,11 +169,7 @@ services:
     ports:
       - 27124:27017
     restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "mongosh --username $MONGODB_INIT_ROOT_USERNAME --password $MONGODB_INIT_ROOT_PASSWORD --authenticationDatabase admin --eval 'db.adminCommand({ ping: 1 })'"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+
     logging:
       driver: "json-file"
       options:
@@ -225,11 +193,7 @@ services:
     links:
       - shard02-b
       - shard02-c
-    healthcheck:
-      test: ["CMD-SHELL", "mongosh --username $MONGODB_INIT_ROOT_USERNAME --password $MONGODB_INIT_ROOT_PASSWORD --authenticationDatabase admin --eval 'db.adminCommand({ ping: 1 })'"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+
     logging:
       driver: "json-file"
       options:
@@ -249,11 +213,7 @@ services:
     ports:
       - 27126:27017
     restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "mongosh --username $MONGODB_INIT_ROOT_USERNAME --password $MONGODB_INIT_ROOT_PASSWORD --authenticationDatabase admin --eval 'db.adminCommand({ ping: 1 })'"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+
     logging:
       driver: "json-file"
       options:
@@ -273,11 +233,7 @@ services:
     ports:
       - 27127:27017
     restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "mongosh --username $MONGODB_INIT_ROOT_USERNAME --password $MONGODB_INIT_ROOT_PASSWORD --authenticationDatabase admin --eval 'db.adminCommand({ ping: 1 })'"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+
     logging:
       driver: "json-file"
       options:
@@ -301,11 +257,7 @@ services:
     links:
       - shard03-b
       - shard03-c
-    healthcheck:
-      test: ["CMD-SHELL", "mongosh --username $MONGODB_INIT_ROOT_USERNAME --password $MONGODB_INIT_ROOT_PASSWORD --authenticationDatabase admin --eval 'db.adminCommand({ ping: 1 })'"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+
     logging:
       driver: "json-file"
       options:
@@ -325,11 +277,7 @@ services:
     ports:
       - 27129:27017
     restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "mongosh --username $MONGODB_INIT_ROOT_USERNAME --password $MONGODB_INIT_ROOT_PASSWORD --authenticationDatabase admin --eval 'db.adminCommand({ ping: 1 })'"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+
     logging:
       driver: "json-file"
       options:
@@ -349,11 +297,7 @@ services:
     ports:
       - 27130:27017
     restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "mongosh --username $MONGODB_INIT_ROOT_USERNAME --password $MONGODB_INIT_ROOT_PASSWORD --authenticationDatabase admin --eval 'db.adminCommand({ ping: 1 })'"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+
     logging:
       driver: "json-file"
       options:
