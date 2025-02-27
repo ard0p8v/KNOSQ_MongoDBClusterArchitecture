@@ -1,52 +1,10 @@
 services:
-  ## routers
-  router01:
-    image: mongo:latest
-    container_name: router-01
-    command: mongos --port 27017 --configdb rs-config-server/configsvr01:27017,configsvr02:27017,configsvr03:27017 --bind_ip_all --keyFile /data/mongodb-keyfile
-    ports:
-      - "27117:27017"
-    restart: always
-    volumes:
-      - ./scripts:/scripts
-      - ./datasets:/datasets
-      - ./security/mongodb-keyfile:/data/mongodb-keyfile
-      - mongodb_cluster_router01_db:/data/db
-      - mongodb_cluster_router01_config:/data/configdb
-
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  router02:
-    image: mongo:latest
-    container_name: router-02
-    command: mongos --port 27017 --configdb rs-config-server/configsvr01:27017,configsvr02:27017,configsvr03:27017 --bind_ip_all --keyFile /data/mongodb-keyfile
-    volumes:
-      - ./scripts:/scripts
-      - ./datasets:/datasets
-      - ./security/mongodb-keyfile:/data/mongodb-keyfile
-      - mongodb_cluster_router02_db:/data/db
-      - mongodb_cluster_router02_config:/data/configdb
-    ports:
-      - "27118:27017"
-    restart: always
-    links:
-      - router01
-
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
   ## config servers
   configsvr01:
     image: mongo:latest
     container_name: mongo-config-01
-    command: mongod --port 27017 --configsvr --replSet rs-config-server --auth --keyFile /data/mongodb-keyfile --bind_ip_all
+    command: mongod --port 27017 --configsvr --replSet rs-config-server --auth --keyFile /data/mongodb-keyfile --bind_ip_all 
     volumes:
       - ./scripts:/scripts
       - ./datasets:/datasets
@@ -56,11 +14,18 @@ services:
     ports:
       - 27119:27017
     restart: always
-    links:
-      - shard01-a
-      - shard02-a
-      - shard03-a
-
+    healthcheck:
+      test: >
+        bash -c '
+        if mongosh --port 27017 --eval "db.adminCommand({ ping: 1 })" > /dev/null; then
+          mongosh < /scripts/init-configserver.js || exit 1
+        else
+          exit 1
+        fi'
+      interval: 10s
+      timeout: 20s
+      retries: 3
+      start_period: 30s
     logging:
       driver: "json-file"
       options:
@@ -82,7 +47,12 @@ services:
     restart: always
     links:
       - configsvr01
-
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --port 27017 --eval 'db.adminCommand({ ping: 1 })'"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     logging:
       driver: "json-file"
       options:
@@ -104,7 +74,12 @@ services:
     restart: always
     links:
       - configsvr02
-
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --port 27017 --eval 'db.adminCommand({ ping: 1 })'"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     logging:
       driver: "json-file"
       options:
@@ -129,7 +104,24 @@ services:
     links:
       - shard01-b
       - shard01-c
-
+    depends_on:
+      configsvr01:
+        condition: service_healthy
+      configsvr02:
+        condition: service_healthy
+      configsvr03:
+        condition: service_healthy
+    healthcheck:
+      test: |
+        bash -c 'if mongosh --port 27017 --eval "db.adminCommand({ ping: 1 })" > /dev/null; then
+          mongosh < /scripts/init-shard01.js || exit 1
+        else
+          exit 1
+        fi'
+      interval: 10s
+      timeout: 20s
+      retries: 3
+      start_period: 30s
     logging:
       driver: "json-file"
       options:
@@ -149,7 +141,12 @@ services:
     ports:
       - 27123:27017
     restart: always
-
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --port 27017 --eval 'db.adminCommand({ ping: 1 })'"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     logging:
       driver: "json-file"
       options:
@@ -169,7 +166,12 @@ services:
     ports:
       - 27124:27017
     restart: always
-
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --port 27017 --eval 'db.adminCommand({ ping: 1 })'"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     logging:
       driver: "json-file"
       options:
@@ -193,7 +195,24 @@ services:
     links:
       - shard02-b
       - shard02-c
-
+    depends_on:
+      configsvr01:
+        condition: service_healthy
+      configsvr02:
+        condition: service_healthy
+      configsvr03:
+        condition: service_healthy
+    healthcheck:
+      test: |
+        bash -c 'if mongosh --port 27017 --eval "db.adminCommand({ ping: 1 })" > /dev/null; then
+          mongosh < /scripts/init-shard02.js || exit 1
+        else
+          exit 1
+        fi'
+      interval: 10s
+      timeout: 20s
+      retries: 3
+      start_period: 30s
     logging:
       driver: "json-file"
       options:
@@ -213,7 +232,12 @@ services:
     ports:
       - 27126:27017
     restart: always
-
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --port 27017 --eval 'db.adminCommand({ ping: 1 })'"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     logging:
       driver: "json-file"
       options:
@@ -233,7 +257,12 @@ services:
     ports:
       - 27127:27017
     restart: always
-
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --port 27017 --eval 'db.adminCommand({ ping: 1 })'"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     logging:
       driver: "json-file"
       options:
@@ -257,7 +286,24 @@ services:
     links:
       - shard03-b
       - shard03-c
-
+    depends_on:
+      configsvr01:
+        condition: service_healthy
+      configsvr02:
+        condition: service_healthy
+      configsvr03:
+        condition: service_healthy
+    healthcheck:
+      test: |
+        bash -c 'if mongosh --port 27017 --eval "db.adminCommand({ ping: 1 })" > /dev/null; then
+          mongosh < /scripts/init-shard03.js || exit 1
+        else
+          exit 1
+        fi'
+      interval: 10s
+      timeout: 20s
+      retries: 3
+      start_period: 30s
     logging:
       driver: "json-file"
       options:
@@ -277,7 +323,12 @@ services:
     ports:
       - 27129:27017
     restart: always
-
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --port 27017 --eval 'db.adminCommand({ ping: 1 })'"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     logging:
       driver: "json-file"
       options:
@@ -297,7 +348,179 @@ services:
     ports:
       - 27130:27017
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --port 27017 --eval 'db.adminCommand({ ping: 1 })'"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
+  ## shard 04
+  shard04-a:
+    image: mongo:latest
+    container_name: shard-04-node-a
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-04 --auth --keyFile /data/mongodb-keyfile --bind_ip_all
+    volumes:
+      - ./scripts:/scripts
+      - ./datasets:/datasets
+      - ./security/mongodb-keyfile:/data/mongodb-keyfile
+      - mongodb_cluster_shard04_a_db:/data/db
+      - mongodb_cluster_shard04_a_config:/data/configdb
+    ports:
+      - 27131:27017
+    restart: always
+    links:
+      - shard04-b
+      - shard04-c
+    depends_on:
+      configsvr01:
+        condition: service_healthy
+      configsvr02:
+        condition: service_healthy
+      configsvr03:
+        condition: service_healthy
+    healthcheck:
+      test: |
+        bash -c 'if mongosh --port 27017 --eval "db.adminCommand({ ping: 1 })" > /dev/null; then
+          mongosh < /scripts/init-shard04.js || exit 1
+        else
+          exit 1
+        fi'
+      interval: 10s
+      timeout: 20s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  shard04-b:
+    image: mongo:latest
+    container_name: shard-04-node-b
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-04 --auth --keyFile /data/mongodb-keyfile --bind_ip_all
+    volumes:
+      - ./scripts:/scripts
+      - ./datasets:/datasets
+      - ./security/mongodb-keyfile:/data/mongodb-keyfile
+      - mongodb_cluster_shard04_b_db:/data/db
+      - mongodb_cluster_shard04_b_config:/data/configdb
+    ports:
+      - 27132:27017
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --port 27017 --eval 'db.adminCommand({ ping: 1 })'"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  shard04-c:
+    image: mongo:latest
+    container_name: shard-04-node-c
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-04 --auth --keyFile /data/mongodb-keyfile --bind_ip_all
+    volumes:
+      - ./scripts:/scripts
+      - ./datasets:/datasets
+      - ./security/mongodb-keyfile:/data/mongodb-keyfile
+      - mongodb_cluster_shard04_c_db:/data/db
+      - mongodb_cluster_shard04_c_config:/data/configdb
+    ports:
+      - 27133:27017
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --port 27017 --eval 'db.adminCommand({ ping: 1 })'"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  ## routers
+  router01:
+    image: mongo:latest
+    container_name: router-01
+    command: mongos --port 27017 --configdb rs-config-server/configsvr01:27017,configsvr02:27017,configsvr03:27017 --bind_ip_all --keyFile /data/mongodb-keyfile
+    ports:
+      - "27117:27017"
+    restart: always
+    volumes:
+      - ./scripts:/scripts
+      - ./datasets:/datasets
+      - ./security/mongodb-keyfile:/data/mongodb-keyfile
+      - mongodb_cluster_router01_db:/data/db
+      - mongodb_cluster_router01_config:/data/configdb
+    depends_on:
+      shard01-a:
+        condition: service_healthy
+      shard02-a:
+        condition: service_healthy
+      shard03-a:
+        condition: service_healthy
+      shard04-a:
+        condition: service_healthy
+    healthcheck:
+      test: |
+        bash -c 'if mongosh --port 27017 --eval "db.adminCommand({ ping: 1 })" > /dev/null; then
+          mongosh < /scripts/init-router.js || exit 1
+        else
+          exit 1
+        fi'
+      interval: 10s
+      timeout: 20s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  router02:
+    image: mongo:latest
+    container_name: router-02
+    command: mongos --port 27017 --configdb rs-config-server/configsvr01:27017,configsvr02:27017,configsvr03:27017 --bind_ip_all --keyFile /data/mongodb-keyfile
+    volumes:
+      - ./scripts:/scripts
+      - ./datasets:/datasets
+      - ./security/mongodb-keyfile:/data/mongodb-keyfile
+      - mongodb_cluster_router02_db:/data/db
+      - mongodb_cluster_router02_config:/data/configdb
+    ports:
+      - "27118:27017"
+    restart: always
+    links:
+      - router01
+    depends_on:
+      shard01-a:
+        condition: service_healthy
+      shard02-a:
+        condition: service_healthy
+      shard03-a:
+        condition: service_healthy
+      shard04-a:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --port 27017 --eval 'db.adminCommand({ ping: 1 })'"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     logging:
       driver: "json-file"
       options:
