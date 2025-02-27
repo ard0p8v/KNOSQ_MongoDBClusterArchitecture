@@ -15,8 +15,6 @@ mongosh < /scripts/init-shard02.js
 sleep 5
 mongosh < /scripts/init-shard03.js
 sleep 5
-mongosh < /scripts/init-shard04.js
-sleep 5
 
 echo "Inicializace routeru..."
 mongosh < /scripts/init-router.js
@@ -31,7 +29,5 @@ sleep 5
 mongosh shard02-a:27017 < /scripts/init-auth.js
 sleep 5
 mongosh shard03-a:27017 < /scripts/init-auth.js
-sleep 5
-mongosh shard04-a:27017 < /scripts/init-auth.js
 
 echo "Inicializace dokončena!"
