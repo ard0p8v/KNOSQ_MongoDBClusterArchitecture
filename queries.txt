@@ -1,0 +1,258 @@
+db.spotify_data.updateOne(
+    { track_id: "53QF56cjZA9RTuuMZDrSA6" },
+    { $set: { popularity: 90 } }
+);
+--------------------------------------------------------
+db.beers_review.deleteMany(
+   { user_profileName: null }
+);
+--------------------------------------------------------
+db.titanic_passengers.updateMany(
+   { Embarked: "S" },
+   { $set: 
+      { Embarked: "Southampton" } 
+   }
+);
+--------------------------------------------------------
+db.beers_review.insertOne({
+index: 1,
+  	beer_ABV: 5,
+  	beer_beerId: 1,
+  	beer_brewerId: 2,
+  	beer_name: "Poutník 12",
+  	beer_style: "Poutník Pelhřimov",
+  	review_appearance: 5.0,
+  	review_aroma: 5.0,
+  	review_overall: 5.5,
+  	review_palate: 5.0,
+  	review_taste: 5.0,
+  	review_text: "Nejlepší pivo na světe.",
+  	review_timeStruct: "2025-02-20 13:45:49",
+  	review_timeUnix: 1677426349,
+  	user_ageInSeconds: 1000000,
+  	userId: "ard0p8v"
+});
+--------------------------------------------------------
+db.spotify_data.insertMany([
+  {
+    index: 1,
+    artist_name: "František Nedvěd",
+    track_name: "Stánky",
+    track_id: "fero_nedved_stanky",
+    popularity: 65.0,
+    year: 2025.0,
+    genre: "country",
+    danceability: 0.7,
+    energy: 0.8,
+    key: 4,
+    loudness: -6.0,
+    mode: 1.0,
+    speechiness: 0.04,
+    acousticness: 0.2,
+    instrumentalness: 0.1,
+    liveness: 0.3,
+    valence: 0.7,
+    tempo: 20.0,
+    duration_ms: 200000.0,
+    time_signature: 4
+  },
+  {
+    index: 2,
+    artist_name: "Calin",
+    track_name: "Hannah Montana",
+    track_id: "calin_hannah_montana",
+    popularity: 55.0,
+    year: 2025.0,
+    genre: "rap",
+    danceability: 0.6,
+    energy: 0.7,
+    key: 3,
+    loudness: -7.0,
+    mode: 1.0,
+    speechiness: 0.03,
+    acousticness: 0.3,
+    instrumentalness: 0.2,
+    liveness: 0.4,
+    valence: 0.6,
+    tempo: 100.0,
+    duration_ms: 190000.0,
+    time_signature: 4
+  }
+]);
+--------------------------------------------------------
+db.titanic_passengers.updateMany(
+    { Fare: { $gt: 100 } },
+    { $set: { VIP: true } }
+);
+--------------------------------------------------------
+db.spotify_data.aggregate([
+    { $group: { _id: "$artist_name", count: { $sum: 1 } } },
+    { $sort: { count: -1 } },
+    { $limit: 10 }
+])
+--------------------------------------------------------
+db.beers_review.aggregate([
+    { $group: { _id: "$beer_style", avg_rating: { $avg: "$review_overall" } } }
+])
+--------------------------------------------------------
+db.titanic_passengers.aggregate([
+    { $group: { _id: "$Survived", count: { $sum: 1 } } }
+])
+--------------------------------------------------------
+db.spotify_data.aggregate([
+    { $group: { _id: "$genre", avg_loudness: { $avg: "$loudness" } } },
+    { $sort: { avg_loudness: -1 } }
+]);
+--------------------------------------------------------
+db.beers_review.aggregate([
+    { $group: { _id: "$beer_name", avg_rating: { $avg: "$review_overall" } } },
+    { $sort: { avg_rating: -1 } },
+    { $limit: 10 }
+]);
+--------------------------------------------------------
+db.titanic_passengers.aggregate([
+    { $group: { _id: "$Pclass", avg_fare: { $avg: "$Fare" } } },
+    { $sort: { _id: 1 } }
+]);
+--------------------------------------------------------
+db.spotify_data.find(
+   { popularity: 
+{ $gt: 80 } 
+   }
+);
+--------------------------------------------------------
+db.beers_review.find(
+   { beer_ABV: 
+      { $gte: 4, $lte: 6 } 
+   }
+);
+--------------------------------------------------------
+db.titanic_passengers.find(
+  { Survived: 1 }
+)
+--------------------------------------------------------
+db.spotify_data.find(
+   { duration_ms: 
+      { $gt: 300000 } 
+   }
+);
+--------------------------------------------------------
+db.beers_review.find({ 
+   user_gender: "Male", 
+   review_overall: { $gte: 4 }, 
+   review_taste: { $gte: 4 }
+}).sort({ review_overall: -1 })
+.limit(10);
+--------------------------------------------------------
+db.titanic_passengers.find(
+   { $or: [
+      { SibSp: { $gt: 0 } }, 
+      { Parch: { $gt: 0 } }
+] });
+--------------------------------------------------------
+db.spotify_data.aggregate([
+    { $match: { year: { $gte: new Date().getFullYear() - 10 } } },
+    { $group: { _id: "$artist_name", count: { $sum: 1 } } },
+    { $sort: { count: -1 } },
+    { $limit: 10 }
+]);
+--------------------------------------------------------
+db.beers_review.aggregate([
+    { $project: { 
+        year: { $year: { $toDate: { $multiply: ["$review_timeUnix", 1000] } } },
+        review_overall: 1 
+    }},
+    { $group: { _id: "$year", avg_rating: { $avg: "$review_overall" } } },
+    { $sort: { _id: 1 } }
+]);
+--------------------------------------------------------
+db.titanic_passengers.aggregate([
+    { $match: { Age: { $type: "number" } } },
+    { $bucket: {
+        groupBy: "$Age",
+        boundaries: [0, 18, 30, 50, 80],
+        default: "80+",
+        output: { count: { $sum: 1 } }
+    } }
+]);
+--------------------------------------------------------
+db.spotify_data.aggregate([
+    { $project: { decade: { $subtract: ["$year", { $mod: ["$year", 10] }] } } },
+    { $group: { _id: "$decade", count: { $sum: 1 } } },
+    { $sort: { _id: 1 } }
+]);
+--------------------------------------------------------
+db.beers_review.aggregate([
+    { $project: { 
+        weekday: { $dayOfWeek: { $toDate: { $multiply: ["$review_timeUnix", 1000] } } } } },
+    { $match: { weekday: { $in: [1, 7] } } }
+]);
+--------------------------------------------------------
+db.titanic_passengers.aggregate([
+    { $group: { _id: "$Pclass", avg_age: { $avg: "$Age" } } },
+    { $sort: { _id: 1 } }
+]);
+--------------------------------------------------------
+db.spotify_data.aggregate([
+    { $project: {
+        track_name: 1,
+        popularity_category: {
+            $switch: {
+                branches: [
+                    { case: { $lt: ["$popularity", 35] }, then: "Low" },
+                    { case: { $lt: ["$popularity", 45] }, then: "Medium" },
+		{ case: { $lt: ["$popularity", 55] }, then: "High"}
+                ],
+                default: "Very High"
+            }
+        }
+    } }
+]);
+--------------------------------------------------------
+db.beers_review.aggregate([
+    { $project: {
+        beer_name: 1,
+        years_since_review: { $subtract: [2025, { $year: { $toDate: { $multiply: ["$review_timeUnix", 1000] } } }] }
+    } }
+]);
+--------------------------------------------------------
+db.titanic_passengers.aggregate([
+    { $project: {
+        Passenger_Info: { $concat: ["Name: ", "$Name", " - Age: ", { $toString: "$Age" }, " - Class: ", { $toString: "$Pclass" }] }
+    } }
+]);
+--------------------------------------------------------
+db.spotify_data.aggregate([
+    { $project: {
+        track_name: 1,
+        audio_features: {
+            danceability: "$danceability",
+            energy: "$energy",
+            valence: "$valence"
+        }
+    } }
+]);
+--------------------------------------------------------
+db.beers_review.aggregate([
+    { $project: {
+        beer_name: 1,
+        review_date: { $dateToString: { format: "%Y-%m-%d", date: { $toDate: { $multiply: ["$review_timeUnix", 1000] } } } }
+    } }
+]);
+--------------------------------------------------------
+db.titanic_passengers.aggregate([
+    { $project: {
+        Name: 1,
+        Age_Group: {
+            $switch: {
+                branches: [
+                    { case: { $lt: ["$Age", 18] }, then: "Child" },
+                    { case: { $lt: ["$Age", 60] }, then: "Adult" }
+                ],
+                default: "Senior"
+            }
+        }
+    } }
+]);
+--------------------------------------------------------
+

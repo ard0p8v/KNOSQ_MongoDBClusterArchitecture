@@ -112,7 +112,7 @@ services:
       configsvr03:
         condition: service_healthy
     healthcheck:
-      test: |
+      test: >
         bash -c 'if mongosh --port 27017 --eval "db.adminCommand({ ping: 1 })" > /dev/null; then
           mongosh < /scripts/init-shard01.js || exit 1
         else
@@ -203,7 +203,7 @@ services:
       configsvr03:
         condition: service_healthy
     healthcheck:
-      test: |
+      test: >
         bash -c 'if mongosh --port 27017 --eval "db.adminCommand({ ping: 1 })" > /dev/null; then
           mongosh < /scripts/init-shard02.js || exit 1
         else
@@ -294,7 +294,7 @@ services:
       configsvr03:
         condition: service_healthy
     healthcheck:
-      test: |
+      test: >
         bash -c 'if mongosh --port 27017 --eval "db.adminCommand({ ping: 1 })" > /dev/null; then
           mongosh < /scripts/init-shard03.js || exit 1
         else
@@ -385,7 +385,7 @@ services:
       configsvr03:
         condition: service_healthy
     healthcheck:
-      test: |
+      test: >
         bash -c 'if mongosh --port 27017 --eval "db.adminCommand({ ping: 1 })" > /dev/null; then
           mongosh < /scripts/init-shard04.js || exit 1
         else
@@ -475,9 +475,9 @@ services:
       shard04-a:
         condition: service_healthy
     healthcheck:
-      test: |
+      test: >
         bash -c 'if mongosh --port 27017 --eval "db.adminCommand({ ping: 1 })" > /dev/null; then
-          mongosh < /scripts/init-router.js || exit 1
+          mongosh < /scripts/init-router.js && mongosh < /scripts/init-auth.js || exit 1         
         else
           exit 1
         fi'
