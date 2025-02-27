@@ -21,37 +21,10 @@ if (adminDb.runCommand({ connectionStatus: 1 }).authInfo.authenticatedUsers.leng
 }
 
 try {
-  adminDb.runCommand({ enableSharding: "nosql_project" });
-  print("Sharding pro databázi 'nosql_project' povolen!");
+  adminDb.runCommand({ enableSharding: "knosq_project" });
+  print("Sharding pro databázi 'knosq_project' povolen!");
 } catch (e) {
   print("Chyba při povolení shardingu (možná již povolen).");
-}
-
-const nosqlDb = conn.getDB("nosql_project");
-
-try {
-  nosqlDb.getCollection("collections").insertOne({ initialized: true });
-  print("Kolekce 'collections' byla inicializována!");
-} catch (e) {
-  print("Kolekce 'collections' již existuje.");
-}
-
-try {
-  nosqlDb.getCollection("collections").createIndex({ oemNumber: "hashed" });
-  print("Index pro shardování byl vytvořen!");
-} catch (e) {
-  print("Chyba při vytváření indexu (možná již existuje).");
-}
-
-try {
-  adminDb.runCommand({
-    shardCollection: "nosql_project.collections",
-    key: { oemNumber: "hashed" },
-    numInitialChunks: 4
-  });
-  print("Sharding pro kolekci 'collections' byl úspěšně nastaven!");
-} catch (e) {
-  print("Chyba při shardování kolekce (možná již nastaveno).");
 }
 
 try {
@@ -59,7 +32,7 @@ try {
     user: "paul",
     pwd: "paulpassword",
     roles: [
-      { role: "readWrite", db: "nosql_project" },
+      { role: "readWrite", db: "knosq_project" },
       { role: "clusterAdmin", db: "admin" }
     ]
   });
@@ -73,7 +46,7 @@ try {
     user: "anna",
     pwd: "annapassword",
     roles: [
-      { role: "read", db: "nosql_project" }
+      { role: "read", db: "knosq_project" }
     ]
   });
   print("Uživatel 'anna' byl vytvořen!");
